@@ -7,10 +7,7 @@ public class PacStudentMovement : MonoBehaviour
     public float moveSpeed = 5f;
     private Vector2[] waypoints;
     private int currentWaypointIndex = 0;
-
-    private AudioSource backgroundMusicSource;
     private AudioSource pelletEatSource;
-    private AudioSource collisionSource;
 
     void Start()
     {
@@ -22,15 +19,7 @@ public class PacStudentMovement : MonoBehaviour
             new Vector2(-1, 1)
         };
 
-        AudioSource[] audioSources = GetComponents<AudioSource>();
-        backgroundMusicSource = audioSources[0];
-        pelletEatSource = audioSources[1];
-        collisionSource = audioSources.Length > 2 ? audioSources[2] : null;
-
-        if (backgroundMusicSource != null && !backgroundMusicSource.isPlaying)
-        {
-            backgroundMusicSource.Play();
-        }
+        pelletEatSource = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -52,11 +41,6 @@ public class PacStudentMovement : MonoBehaviour
         if ((Vector2)transform.position == currentWaypoint)
         {
             currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Length;
-
-            if (pelletEatSource != null)
-            {
-                pelletEatSource.PlayOneShot(pelletEatSource.clip);
-            }
         }
     }
 
@@ -77,6 +61,24 @@ public class PacStudentMovement : MonoBehaviour
         else if (direction.y < 0)
         {
             transform.rotation = Quaternion.Euler(0, 0, -90);
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        Debug.Log("PacStudent collided with something");
+
+        if (collision.gameObject.CompareTag("Pellet"))
+        {
+            Debug.Log("PacStudent collided with a pellet");
+
+            if (pelletEatSource != null)
+            {
+                pelletEatSource.Play();
+            }
+
+            //remove
+            Destroy(collision.gameObject);
         }
     }
 }

@@ -4,9 +4,13 @@ using UnityEngine;
 
 public class PacStudentMovement : MonoBehaviour
 {
-    public float moveSpeed = 5f; 
+    public float moveSpeed = 5f;
     private Vector2[] waypoints;
     private int currentWaypointIndex = 0;
+
+    private AudioSource backgroundMusicSource;
+    private AudioSource pelletEatSource;
+    private AudioSource collisionSource;
 
     void Start()
     {
@@ -17,6 +21,16 @@ public class PacStudentMovement : MonoBehaviour
             new Vector2(-1, -1),
             new Vector2(-1, 1)
         };
+
+        AudioSource[] audioSources = GetComponents<AudioSource>();
+        backgroundMusicSource = audioSources[0];
+        pelletEatSource = audioSources[1];
+        collisionSource = audioSources.Length > 2 ? audioSources[2] : null;
+
+        if (backgroundMusicSource != null && !backgroundMusicSource.isPlaying)
+        {
+            backgroundMusicSource.Play();
+        }
     }
 
     void Update()
@@ -38,6 +52,11 @@ public class PacStudentMovement : MonoBehaviour
         if ((Vector2)transform.position == currentWaypoint)
         {
             currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Length;
+
+            if (pelletEatSource != null)
+            {
+                pelletEatSource.PlayOneShot(pelletEatSource.clip);
+            }
         }
     }
 
@@ -49,7 +68,7 @@ public class PacStudentMovement : MonoBehaviour
         }
         else if (direction.x < 0)
         {
-            transform.rotation = Quaternion.Euler(0, 180, 0); 
+            transform.rotation = Quaternion.Euler(0, 180, 0);
         }
         else if (direction.y > 0)
         {
